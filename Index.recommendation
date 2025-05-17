@@ -1,0 +1,60 @@
+# Telugu Movies and Books Data
+items = [
+    {"type": "movie", "title": "Baahubali", "description": "epic action war kingdom rajamouli"},
+    {"type": "movie", "title": "RRR", "description": "freedom fighters action british rajamouli"},
+    {"type": "movie", "title": "Arjun Reddy", "description": "romantic intense doctor breakup"},
+    {"type": "movie", "title": "Jersey", "description": "cricket emotional father son struggle"},
+    {"type": "movie", "title": "Sita Ramam", "description": "romantic war soldier letters mystery"},
+    {"type": "movie", "title": "Eega", "description": "revenge reincarnation fly fantasy"},
+
+    {"type": "book", "title": "Maa Bhoomi", "description": "revolution rural injustice communism"},
+    {"type": "book", "title": "Chivaraku Migiledi", "description": "mental hospital human emotion realism"},
+    {"type": "book", "title": "Antarmukham", "description": "introspection psychological life mind"},
+    {"type": "book", "title": "Pakkaki Ottigilite", "description": "social satire politics middleclass"},
+    {"type": "book", "title": "Vennello Aadapilla", "description": "romance puzzle mystery chess game"},
+]
+
+# Tokenizer
+def tokenize(text):
+    return text.lower().split()
+
+# Jaccard similarity (set overlap)
+def jaccard_similarity(desc1, desc2):
+    set1 = set(tokenize(desc1))
+    set2 = set(tokenize(desc2))
+    intersection = set1 & set2
+    union = set1 | set2
+    if not union:
+        return 0
+    return len(intersection) / len(union)
+
+# Recommend top-N similar items based on description
+def recommend_similar(title, item_type, top_n=3):
+    target_item = None
+    for item in items:
+        if item["title"] == title and item["type"] == item_type:
+            target_item = item
+            break
+    if not target_item:
+        return []
+
+    similarities = []
+    for item in items:
+        if item["title"] == title or item["type"] != item_type:
+            continue
+        score = jaccard_similarity(target_item["description"], item["description"])
+        similarities.append((item["title"], score))
+
+    similarities.sort(key=lambda x: x[1], reverse=True)
+    return [title for title, _ in similarities[:top_n]]
+
+#  usage
+def main():
+    print("🎬 Similar Telugu movies to 'RRR':", recommend_similar("RRR", "movie"))
+    print("📚 Similar Telugu books to 'Maa Bhoomi':", recommend_similar("Maa Bhoomi", "book"))
+    print("🎬 Similar Telugu movies to 'Sita Ramam':", recommend_similar("Sita Ramam", "movie"))
+    print("📚 Similar Telugu books to 'Antarmukham':", recommend_similar("Antarmukham", "book"))
+
+if __name__ == "__main__":
+    main()
+            
